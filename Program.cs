@@ -1,10 +1,9 @@
 ﻿using System;
 using System.IO;
 using System.Collections.Generic;
-using System.Text;
-using System.Reflection.PortableExecutable;
 using System.Text.RegularExpressions;
 using System.Linq;
+
 
 
 namespace Module1
@@ -42,54 +41,81 @@ namespace Module1
 
         static void Task1()
         {
-            string text = File.ReadAllText(@"less1.1.txt");
-
-            File.WriteAllText("less1.2.txt", $"{text}");
-
-            Console.WriteLine("Vvedite simvol/slovo: ");
-            string input = Console.ReadLine();
-
-            int indexOfinput = text.IndexOf(input);
-           
-            if (indexOfinput == -1)
+            string curFile = @"less1.1.txt";
+            if (File.Exists(curFile) == true)
             {
-                Console.WriteLine("Dannogo sochetania simvolov net v tekste");
+                string text = File.ReadAllText(@"less1.1.txt");
+
+                File.WriteAllText("less1.2.txt", $"{text}");
+
+                Console.WriteLine("Vvedite simvol/slovo: ");
+                string input = Console.ReadLine();
+
+                int indexOfinput = text.IndexOf(input);
+
+                if (indexOfinput == -1)
+                {
+                    Console.WriteLine("Dannogo sochetania simvolov net v tekste");
+                }
+                else
+                {
+                    text = text.Replace($"{input}", "");
+                    Console.WriteLine("Vash tekst: '{0}'\n", text);
+                    File.WriteAllText(@"less1.1.txt", "{text}");
+                }
             }
             else
             {
-                text = text.Replace($"{input}", "");
-                Console.WriteLine("Vash tekst: '{0}'\n", text);
-                File.WriteAllText(@"less1.1.txt", $"{text}");
+                Console.WriteLine("Файл для считывания не найден");
             }
         }
 
             static void Task2()
         {
-            string text = File.ReadAllText(@"less1.txt");
-            Regex regex = new Regex(@"\b\w+[-']*\w*\b");
-            MatchCollection matches = regex.Matches(text);
-            Console.WriteLine(matches.Count);
-
-            for (int i = 9; i < matches.Count; i += 10)
+            string curFile = @"less1.txt";
+            if (File.Exists(curFile) == true)
             {
-                Console.Write(matches[i].Value);
-                if (i + 10 < matches.Count)
-                {
-                    Console.Write(", ");
-                }
+                string text = File.ReadAllText(@"less1.txt");
+                
+                    Regex regex = new Regex(@"\b\w+[-']*\w*\b");
+                    MatchCollection matches = regex.Matches(text);
+                    Console.WriteLine(matches.Count);
+
+                    for (int i = 9; i < matches.Count; i += 10)
+                    {
+
+                        Console.Write(String.Join(",", matches[i].Value, " "));
+
+                    }
+                
             }
-
-
+            else
+            {
+                Console.WriteLine("Файл для считывания не найден");
+            }
         }
 
 
         static void Task3()
         {
-            string text = File.ReadAllText(@"less1.txt");
+            string curFile = @"less1.txt";
+            if (File.Exists(curFile) == true)
+            {
+                string text = File.ReadAllText(@"less1.txt");
             Regex regex1 = new Regex(@"([А-ЯA-Z]((т.п.|т.д.|пр.)|[^?!.\(]|\([^\)]*\))*[.?!])");
             MatchCollection matches1 = regex1.Matches(text);
             Console.WriteLine(string.Concat(matches1[2].Value.Reverse()));
+            }
+            else
+            {
+                Console.WriteLine("Файл для считывания не найден");
+            }
+
         }
+
+
+
+
         static void Task4()
         {
             Console.WriteLine("Введите путь (пример С:temp\\):");
