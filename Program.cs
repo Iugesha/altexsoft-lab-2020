@@ -8,115 +8,149 @@ using System.Linq;
 
 namespace Module1
 {
-    class Program
+    abstract class FileClass
     {
-        static void Main(string[] args)
+        public string text;
+        public Dictionary<string, string> fileList;
+        public void DisplayFile(string dirName)
         {
-            Console.WriteLine("Считать файл и удалить символ/слово - введите 1. \n" +
-                "Считать файл, вывести количество слов и каждое десятое слово через запятую - введите 2.\n" +
-                "Вывести 3-е предложение так, чтобы буквы стояли в обратном порядке - введите 3.\n" +
-                "Вывести Вывести имена папок по указанному пути в консоли - введите 4.\n" + "Сделайте свой выбор: ");
-            string vibor = Console.ReadLine();
-            switch (vibor)
+            string[] files = Directory.GetFiles(dirName);
+
+            if (files.Length > 1)
             {
-                case "1":
-                    Task1();
-                    break;
-                case "2":
-                    Task2();
-                    break;
-                case "3":
-                    Task3();
-                    break;
-                case "4":
-                    Task4();
-                    break;
-                default:
-                    Console.WriteLine("Вы нажали неверный символ");
-                    break;
+                this.fileList = new Dictionary<string, string>(files.Length);
+                Console.WriteLine("Файлы:");
+                Array.Sort(files);
+                foreach (string s in files)
+                {
+
+                    this.fileList.Add(Convert.ToString(Array.IndexOf(files, s)), s);
+                }
+                foreach (KeyValuePair<string, string> keyValue in this.fileList)
+                {
+                    Console.WriteLine(keyValue.Key + " - " + keyValue.Value);
+                }
             }
-        
+            else
+            {
+                Console.WriteLine("Данная папка не содержит файлы");
+            }
         }
 
-
-        static void Task1()
+        public void SelectFile()
         {
-            string curFile = @"less1.1.txt";
-            if (File.Exists(curFile) == true)
+            Console.WriteLine("Введите индекс файла:");
+            string index = Console.ReadLine();
+            string fileName;
+
+            if (this.fileList.TryGetValue(index, out fileName))
             {
-                string text = File.ReadAllText(@"less1.1.txt");
+                Console.WriteLine(fileName);
 
-                File.WriteAllText("less1.2.txt", $"{text}");
-
-                Console.WriteLine("Vvedite simvol/slovo: ");
-                string input = Console.ReadLine();
-
-                int indexOfinput = text.IndexOf(input);
-
-                if (indexOfinput == -1)
+                if (File.Exists(fileName) == true)
                 {
-                    Console.WriteLine("Dannogo sochetania simvolov net v tekste");
+                    this.text = File.ReadAllText(@fileName);
                 }
                 else
                 {
-                    text = text.Replace($"{input}", "");
-                    Console.WriteLine("Vash tekst: '{0}'\n", text);
-                    File.WriteAllText(@"less1.1.txt", "{text}");
+                    Console.WriteLine("Файл для считывания не найден");
                 }
             }
             else
             {
-                Console.WriteLine("Файл для считывания не найден");
+                Console.WriteLine("Вы ввели неверный индекс");
+                this.SelectFile();
             }
         }
+    }
 
-            static void Task2()
+    class Task1 : FileClass
+    {
+        public Task1()
         {
-            string curFile = @"less1.txt";
-            if (File.Exists(curFile) == true)
+            this.DisplayFile("./");
+            this.SelectFile();
+            this.Run();
+        }
+
+        public void Run()
+        {
+            File.WriteAllText("less1.2.txt", this.text);
+
+            Console.WriteLine("Vvedite simvol/slovo: ");
+
+            string input = Console.ReadLine();
+
+            int indexOfinput = text.IndexOf(input);
+
+            if (indexOfinput == -1)
             {
-                string text = File.ReadAllText(@"less1.txt");
-                
-                    Regex regex = new Regex(@"\b\w+[-']*\w*\b");
-                    MatchCollection matches = regex.Matches(text);
-                    Console.WriteLine(matches.Count);
-
-                    for (int i = 9; i < matches.Count; i += 10)
-                    {
-
-                        Console.Write(String.Join(",", matches[i].Value, " "));
-
-                    }
-                
+                Console.WriteLine("Dannogo sochetania simvolov net v tekste");
             }
             else
             {
-                Console.WriteLine("Файл для считывания не найден");
+                string text = this.text.Replace(input, "");
+                Console.WriteLine("Vash tekst: '{0}'\n", text);
+                File.WriteAllText(@"less1.1.txt", text);
             }
         }
+    }
 
-
-        static void Task3()
+    class Task2 : FileClass
+    {
+        public Task2()
         {
-            string curFile = @"less1.txt";
-            if (File.Exists(curFile) == true)
+            this.DisplayFile("./");
+            this.SelectFile();
+            this.Run();
+        }
+
+        public void Run()
+        {
+            Regex regex = new Regex(@"\b\w+[-']*\w*\b");
+
+            MatchCollection matches = regex.Matches(this.text);
+
+            Console.WriteLine(matches.Count);
+
+
+            string[] stringTen = new string[matches.Count / 10];
+
+            for (int i = 1; i * 10 < matches.Count; i++)
             {
-                string text = File.ReadAllText(@"less1.txt");
+                stringTen[i - 1] = matches[i * 10 - 1].Value;
+            };
+
+
+            Console.WriteLine(String.Join(", ", stringTen));
+        }
+    }
+
+    class Task3 : FileClass
+    {
+        public Task3()
+        {
+            this.DisplayFile("./");
+            this.SelectFile();
+            this.Run();
+        }
+
+        public void Run()
+        {
             Regex regex1 = new Regex(@"([А-ЯA-Z]((т.п.|т.д.|пр.)|[^?!.\(]|\([^\)]*\))*[.?!])");
-            MatchCollection matches1 = regex1.Matches(text);
+            MatchCollection matches1 = regex1.Matches(this.text);
             Console.WriteLine(string.Concat(matches1[2].Value.Reverse()));
-            }
-            else
-            {
-                Console.WriteLine("Файл для считывания не найден");
-            }
+        }
+    }
 
+    class Task4 : FileClass
+    {
+        public Task4()
+        {
+            this.Run();
         }
 
-
-
-
-        static void Task4()
+        public void Run()
         {
             Console.WriteLine("Введите путь (пример С:temp\\):");
             string dirName = Console.ReadLine();
@@ -133,7 +167,6 @@ namespace Module1
                         Array.Sort(dirn);
                         foreach (string s in dirn)
                         {
-                            
                             tabl.Add(Convert.ToString(Array.IndexOf(dirn, s)), s);
                         }
 
@@ -150,21 +183,7 @@ namespace Module1
                         if (tabl.TryGetValue(fb, out mar))
                         {
                             Console.WriteLine(mar);
-                             
-                                string[] files = Directory.GetFiles(mar);
-                            if (files.Length > 1)
-                            {
-                                Console.WriteLine("Файлы:");
-                                Array.Sort(files);
-                                foreach (string f in files)
-                                {
-                                    Console.WriteLine(f);
-                                }
-                            }
-                            else
-                            {
-                                Console.WriteLine("Данная папка не содержит файлы");
-                            }
+                            this.DisplayFile(mar);
                         }
                         else
                         {
@@ -186,9 +205,37 @@ namespace Module1
             {
                 Console.WriteLine("Повезет в следующий раз. Но это не точно)))");
             }
+        }
+    }
 
+    class Program
+    {
+        static void Main(string[] args)
+        {
+            Console.WriteLine("Считать файл и удалить символ/слово - введите 1. \n" +
+                "Считать файл, вывести количество слов и каждое десятое слово через запятую - введите 2.\n" +
+                "Вывести 3-е предложение так, чтобы буквы стояли в обратном порядке - введите 3.\n" +
+                "Вывести Вывести имена папок по указанному пути в консоли - введите 4.\n" + "Сделайте свой выбор: ");
+            string vibor = Console.ReadLine();
+            switch (vibor)
+            {
+                case "1":
+                    new Task1();
+                    break;
+                case "2":
+                    new Task2();
+                    break;
+                case "3":
+                    new Task3();
+                    break;
+                case "4":
+                    new Task4();
+                    break;
+                default:
+                    Console.WriteLine("Вы нажали неверный символ");
+                    break;
+            }
 
         }
     }
 }
-    
